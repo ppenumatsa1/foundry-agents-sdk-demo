@@ -1,0 +1,10 @@
+{
+  "answer": "The total due on invoice INV-1002 is $565.00.",
+  "top_documents": [
+    {
+      "doc_id": "assistant-001",
+      "file_name": "invoice_INV-1002.txt",
+      "snippet": "Total Due: $565.00"
+    }
+  ]
+}
