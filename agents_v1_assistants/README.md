@@ -37,6 +37,16 @@ You should see a JSON response with `answer` and `top_documents`.
 - "List all line items on invoice INV-1005."
 - "What is the PO number for invoice INV-1002?"
 
+## Expected answers (current data)
+
+- INV-1001 total due: $107.42
+- INV-1003 due date: 2025-11-09
+- INV-1004 vendor: Northwind IT Services
+- INV-1005 line items:
+  - Cardboard boxes (large) — Qty 100, Unit Price $1.20, Line Total $120.00
+  - Packing tape (bulk) — Qty 10, Unit Price $3.50, Line Total $35.00
+- INV-1002 PO number: PO-7810
+
 ## Notes
 
 - Uses shared data from ../../data/invoices

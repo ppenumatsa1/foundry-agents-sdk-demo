@@ -20,11 +20,11 @@ Copy and edit `.env`:
 
 ## Index invoices
 
-python src/index_invoices.py
+python3 src/index_invoices.py
 
 ## Ask a question
 
-python src/run_agent.py "What is the total due on invoice INV-1002?"
+python3 src/run_agent.py "What is the total due on invoice INV-1002?"
 
 ## Expected output (example)
 
