@@ -1,6 +1,7 @@
-# agetns_v2_responses_latest (Foundry + Responses API)
+# agents_v2_responses (Foundry + Responses API)
 
 Azure AI Foundry agent creation via `azure-ai-projects` and invocation via the Responses API.
+This sample uses `azure-ai-projects==2.0.0b4`.
 
 ## Setup
 
@@ -24,11 +25,20 @@ python3 src/index_invoices.py
 
 ## Ask a question
 
+Non-streaming:
+
 python3 src/run_agent.py "What is the total due on invoice INV-1002?"
+
+Streaming:
+
+python3 src/run_agent.py --stream "What is the total due on invoice INV-1002?"
 
 ## Expected output (example)
 
 You should see a JSON response with `answer` and `top_documents`.
+
+In streaming mode, text is emitted incrementally and the final output remains
+schema-shaped JSON.
 
 ## Example questions
 
@@ -42,3 +52,5 @@ You should see a JSON response with `answer` and `top_documents`.
 
 - Uses shared data from ../../data/invoices
 - Caches vector store + agent in `.foundry/`
+- Agentic layer defines instructions/tools/schema; inference runs through OpenAI
+  Responses (`responses.create` or `responses.stream`)

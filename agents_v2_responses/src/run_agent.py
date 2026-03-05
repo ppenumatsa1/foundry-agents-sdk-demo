@@ -7,8 +7,8 @@ from azure.ai.projects import AIProjectClient
 from azure.ai.projects.models import (
     FileSearchTool,
     PromptAgentDefinition,
-    PromptAgentDefinitionText,
-    ResponseTextFormatConfigurationJsonSchema,
+    PromptAgentDefinitionTextOptions,
+    TextResponseFormatJsonSchema,
 )
 from azure.identity import AzureCliCredential
 from dotenv import load_dotenv
@@ -76,7 +76,9 @@ def main() -> None:
     print(f"Model: {model}")
     print(f"Agent name: {agent_name}")
 
-    question = " ".join(sys.argv[1:]).strip()
+    use_stream = "--stream" in sys.argv[1:]
+    args = [arg for arg in sys.argv[1:] if arg != "--stream"]
+    question = " ".join(args).strip()
     if not question:
         raise ValueError("Provide a question as a command-line argument")
 
@@ -111,8 +113,8 @@ def main() -> None:
                     model=model,
                     instructions=instructions,
                     tools=[file_search],
-                    text=PromptAgentDefinitionText(
-                        format=ResponseTextFormatConfigurationJsonSchema(
+                    text=PromptAgentDefinitionTextOptions(
+                        format=TextResponseFormatJsonSchema(
                             name="InvoiceAnswer",
                             schema=schema,
                             description="Answer invoice questions with citations.",
@@ -130,13 +132,31 @@ def main() -> None:
             items=[{"type": "message", "role": "user", "content": question}]
         )
 
-        response = openai_client.responses.create(
-            conversation=conversation.id,
-            input="",
-            extra_body={"agent": {"name": agent_name, "type": "agent_reference"}},
-        )
+        request_kwargs = {
+            "conversation": conversation.id,
+            "input": "",
+            "extra_body": {
+                "agent_reference": {"name": agent_name, "type": "agent_reference"}
+            },
+        }
 
-        print(response.output_text)
+        if use_stream:
+            deltas: list[str] = []
+            stream_kwargs = {**request_kwargs, "model": model}
+            with openai_client.responses.stream(**stream_kwargs) as stream:
+                for event in stream:
+                    if event.type == "response.output_text.delta":
+                        deltas.append(event.delta)
+                        print(event.delta, end="", flush=True)
+                response = stream.get_final_response()
+
+            if deltas:
+                print()
+            else:
+                print(response.output_text)
+        else:
+            response = openai_client.responses.create(**request_kwargs)
+            print(response.output_text)
 
 
 if __name__ == "__main__":
